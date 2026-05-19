@@ -1,13 +1,8 @@
 # cvui prompt theme — KAI-blue, two-line, no external deps
 #
 # Layout:
-#   ~/path/to/dir  (git-branch±)                              19:33:24
-#   ❯ command...                                  ⏱ 2s  ✖ 1
-#
-#   - cwd in cyan, git branch with dirty marker in green/yellow
-#   - clock on right
-#   - second line: prompt char (magenta on success, red on failure)
-#   - rprompt on second line shows last command duration + exit code
+#   [time] ~/path/to/dir  (git-branch±)
+#   ❯ command...
 
 autoload -U colors && colors
 autoload -U add-zsh-hook
@@ -30,34 +25,20 @@ _cvui_timer_stop()  {
 add-zsh-hook preexec _cvui_timer_start
 add-zsh-hook precmd  _cvui_timer_stop
 
-# ── git status (no external deps beyond `git` itself) ─────────────────────
+# ── git status ──────────────────────────────────────────────────────────
 _cvui_git() {
   command -v git >/dev/null 2>&1 || return
   local b dirty
-  b=$(command git symbolic-ref --short HEAD 2>/dev/null) \
-    || b=$(command git rev-parse --short HEAD 2>/dev/null) \
-    || return
-  # `--porcelain` is fast and silent; any output = dirty
+  b=$(command git symbolic-ref --short HEAD 2>/dev/null)     || b=$(command git rev-parse --short HEAD 2>/dev/null)     || return
   if [[ -n $(command git status --porcelain 2>/dev/null) ]]; then
-    dirty='%F{221}±%f'
+    dirty="%F{221}±%f"
   else
-    dirty='%F{120}✓%f'
+    dirty="%F{120}✓%f"
   fi
-  printf ' %%F{120}(%s)%s' "$b" "$dirty"
-}
-
-# ── right-prompt (shown on the prompt-char line) ──────────────────────────
-_cvui_rp() {
-  local out=""
-  (( ${_cvui_LAST_DUR:-0} > 1 )) && \
-    out+="%F{93}⏱ ${_cvui_LAST_DUR}s%f  "
-  (( ${_cvui_LAST_STATUS:-0} != 0 )) && \
-    out+="%F{203}✖ ${_cvui_LAST_STATUS}%f"
-  printf '%s' "$out"
+  printf " %%F{120}(%s)%s" "$b" "$dirty"
 }
 
 # ── prompt ────────────────────────────────────────────────────────────────
-# Line 1: cwd (+ git) on the left, clock on the right
-# Line 2: prompt char (cyan ❯, magenta if last command failed)
-PROMPT=$'\n%F{51}[%D{%H:%M:%S}] %F{120}%~%f$(_cvui_git)\n%(?.%F{51}.%F{203})❯%f '
-RPROMPT='$(_cvui_rp)'
+PROMPT="%F{51}[%D{%H:%M:%S}] %F{120}%~%f\$(_cvui_git)%f
+%(?.%F{51}.%F{203})❯%f "
+RPROMPT="%F{93}%(1?. .  )%(1?.\${_cvui_LAST_DUR}s  .)%F{203}%(?..✖ %?)%f"

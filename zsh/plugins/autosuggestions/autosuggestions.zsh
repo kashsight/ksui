@@ -66,18 +66,9 @@ zle -N _ksh_accept_word
 
 # Recompute after each self-insert / backspace.
 _ksh_self_insert() { zle .self-insert; _ksh_suggest; }
-_ksh_backspace()   { zle .backward-delete-char; _ksh_suggest; }
+_ksh_backspace() { zle .backward-delete-char; _ksh_suggest; }
 zle -N self-insert _ksh_self_insert
 zle -N backward-delete-char _ksh_backspace
-
-# Clear the ghost text BEFORE the line is submitted, otherwise POSTDISPLAY
-# leaks into the rendered command line on Enter.
-_ksh_accept_line() {
-  POSTDISPLAY=""
-  _ksh_sugg=""
-  region_highlight=()
-  zle .accept-line
-}
 zle -N accept-line _ksh_accept_line
 
 # Right arrow and Ctrl-F accept; Alt-F accepts one word.
