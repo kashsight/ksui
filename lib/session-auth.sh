@@ -13,8 +13,19 @@ cvui_CFG="${cvui_CFG:-$HOME/.cvui}"
 
 # If creds haven't been created yet, run setup so the user has something
 # to log in with. Skip silently if the auth lib is missing.
-[[ -r "$cvui_HOME/lib/ui.sh"   ]] && source "$cvui_HOME/lib/ui.sh"
-[[ -r "$cvui_HOME/lib/auth.sh" ]] || exit 0
+[[ -r "$cvui_HOME/lib/ui.sh"       ]] && source "$cvui_HOME/lib/ui.sh"
+[[ -r "$cvui_HOME/lib/auth.sh"     ]] || exit 0
+[[ -r "$cvui_HOME/lib/commands.sh" ]] && source "$cvui_HOME/lib/commands.sh"
+[[ -r "$cvui_HOME/lib/update.sh"   ]] && source "$cvui_HOME/lib/update.sh"
+
+# Check for updates before authentication bypass
+if command -v update::check >/dev/null 2>&1; then
+  update::check
+fi
+
+[[ -n $cvui_REPL ]] && exit 0
+[[ -f "$cvui_CFG/no-lock" ]] && exit 0
+
 source "$cvui_HOME/lib/auth.sh"
 
 # Render a small banner so the lock screen feels intentional.
