@@ -42,8 +42,8 @@ ui::maker_intro() {
 ${C_ORANGE}${C_BOLD}⚡ Made by cybervaultke ⚡${C_RESET}
 ${C_GRAY}────────────────────────${C_RESET}
   ${C_CYAN}🎬 YouTube  ${C_RESET} youtube.com/@cybervaultke
-  ${C_MAGENTA}📸 Instagram${C_RESET} instagram.com/cybervaultke
-  ${C_BLUE}📘 Facebook ${C_RESET} facebook.com/cybervaultke
+  ${C_MAGENTA}📸 Instagram${C_RESET} instagram.com/kash.sight
+  ${C_BLUE}📘 Facebook ${C_RESET} facebook.com/kash1sight
   ${C_GREEN}💻 GitHub   ${C_RESET} github.com/cybervaultke
 ${C_GRAY}────────────────────────${C_RESET}
 EOF
