@@ -1,4 +1,4 @@
-# KSUI block-ASCII alphabet (5 rows tall).
+# cvui block-ASCII alphabet (5 rows tall).
 # Format: lines starting with `#` are ignored. Each glyph is introduced by
 #   :<char>
 # followed by exactly 5 lines of art (trailing spaces preserved).

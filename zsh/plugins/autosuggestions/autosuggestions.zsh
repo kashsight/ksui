@@ -5,7 +5,7 @@
 #   →  or Ctrl+F  : accept full suggestion
 #   Alt+→ / M-f   : accept just the next word
 
-: ${KSH_AUTOSUGGEST_COLOR:='fg=240'}
+: ${KSH_AUTOSUGGEST_COLOR:='fg=244'}
 
 typeset -g _ksh_sugg=""
 # Resolve awk to absolute path once. If awk is missing (stock Termux
@@ -21,7 +21,7 @@ _ksh_suggest() {
   [[ -x $_KSH_SUGG_AWK ]] || return
 
   local match
-  match=$(fc -ln 1 2>/dev/null | "$_KSH_SUGG_AWK" -v q="$BUFFER" '
+  match=$(fc -lnr 2>/dev/null | "$_KSH_SUGG_AWK" -v q="$BUFFER" '
     {
       line=$0
       if (index(line,q)==1 && length(line)>length(q)) {

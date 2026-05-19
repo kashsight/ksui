@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────
-#  KSUI .zshrc — fully self-contained
+#  cvui .zshrc — fully self-contained
 #  Everything below is built in-house: prompt, plugins, aliases, motd.
 #  No oh-my-zsh, no powerlevel10k, no external frameworks.
 # ─────────────────────────────────────────────────────────────────────────
@@ -8,7 +8,7 @@
 typeset -U path PATH
 path=( "$HOME/bin" "$HOME/.local/bin" "$PREFIX/bin" $path )
 
-# Suppress Termux's default motd (KSUI ships its own)
+# Suppress Termux's default motd (cvui ships its own)
 export TERMUX_MOTD_DISABLE=1
 
 # Editor preference
@@ -29,11 +29,11 @@ setopt EXTENDED_GLOB
 setopt INTERACTIVE_COMMENTS
 setopt NO_BEEP
 
-# ── KSUI ──────────────────────────────────────────────────────────────────
-# KSUI-BEGIN
-export KSUI_HOME="__KSUI_INSTALL_DIR__"
-[[ -f "$KSUI_HOME/zsh/ksh.zsh" ]] && source "$KSUI_HOME/zsh/ksh.zsh"
-# KSUI-END
+# ── cvui ──────────────────────────────────────────────────────────────────
+# cvui-BEGIN
+export cvui_HOME="__cvui_INSTALL_DIR__"
+[[ -f "$cvui_HOME/zsh/ksh.zsh" ]] && source "$cvui_HOME/zsh/ksh.zsh"
+# cvui-END
 
 # Personal overrides (kept out of the managed block above)
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI sysinfo panel — bash port of GR3YH4TT3R93/termux-motd/20-sysinfo
+# cvui sysinfo panel — bash port of GR3YH4TT3R93/termux-motd/20-sysinfo
 # Adapted to run without zsh-specific array splitting.
 
 W=$'\e[0;39m'; G=$'\e[1;32m'; C=$'\e[1;36m'; B=$'\033[1m'; R=$'\033[0m'

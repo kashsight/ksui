@@ -1,12 +1,12 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI uninstaller — SAFE / NON-DESTRUCTIVE
+# cvui uninstaller — SAFE / NON-DESTRUCTIVE
 #
 # Removes:
-#   • KSUI install dir (~/.ksui-app by default)
-#   • `ksui` symlink in $PREFIX/bin
+#   • cvui install dir (~/.cvui-app by default)
+#   • `cvui` symlink in $PREFIX/bin
 #   • Restores ~/.termux/font.ttf, colors.properties, termux.properties
-#     from their .ksui-backup files if present.
-#   • With --purge-config: also removes ~/.ksui (credentials)
+#     from their .cvui-backup files if present.
+#   • With --purge-config: also removes ~/.cvui (credentials)
 #
 # Never removes:
 #   • Shared deps (git, curl, tgpt, espeak, lsd, figlet, lolcat, neofetch,
@@ -14,9 +14,9 @@
 set -eu
 
 PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
-INSTALL_DIR="${KSUI_INSTALL_DIR:-$HOME/.ksui-app}"
-CFG_DIR="$HOME/.ksui"
-BIN_LINK="$PREFIX/bin/ksui"
+INSTALL_DIR="${cvui_INSTALL_DIR:-$HOME/.cvui-app}"
+CFG_DIR="$HOME/.cvui"
+BIN_LINK="$PREFIX/bin/cvui"
 TERMUX_DIR="${TERMUX_DIR:-$HOME/.termux}"
 
 say()  { printf "\033[38;5;120m✔\033[0m %s\n" "$*"; }
@@ -32,7 +32,7 @@ for a in "$@"; do
   esac
 done
 
-info "KSUI uninstaller — will ONLY remove KSUI's own files."
+info "cvui uninstaller — will ONLY remove cvui's own files."
 info "Shared dependencies (git, curl, tgpt, espeak, lsd, …) will be kept."
 echo
 
@@ -41,15 +41,15 @@ read -r -p "Proceed with uninstall? [y/N] " yn
 
 restore_or_remove() {
   # restore_or_remove <path>
-  # If <path>.ksui-backup exists → restore it. Otherwise remove <path>
-  # IF AND ONLY IF we can tell KSUI placed it there (i.e. there's no
+  # If <path>.cvui-backup exists → restore it. Otherwise remove <path>
+  # IF AND ONLY IF we can tell cvui placed it there (i.e. there's no
   # backup, meaning it didn't exist before install). We can't prove that
   # though, so we err on the side of keeping the file and just inform.
   local f=$1
-  if [[ -e $f.ksui-backup ]]; then
-    mv -f "$f.ksui-backup" "$f" && say "Restored $f from backup"
+  if [[ -e $f.cvui-backup ]]; then
+    mv -f "$f.cvui-backup" "$f" && say "Restored $f from backup"
   else
-    info "No backup for $f — leaving as-is (KSUI can't prove it owned it)"
+    info "No backup for $f — leaving as-is (cvui can't prove it owned it)"
   fi
 }
 
@@ -64,20 +64,20 @@ fi
 restore_or_remove "$TERMUX_DIR/font.ttf"
 restore_or_remove "$TERMUX_DIR/colors.properties"
 restore_or_remove "$TERMUX_DIR/termux.properties"
-# Restore the global zprofile motd hook if KSUI disabled it
+# Restore the global zprofile motd hook if cvui disabled it
 restore_or_remove "$PREFIX/etc/zprofile"
 
-# 2b. strip KSUI block from ~/.zshrc (including its header comments + surrounding blank lines)
+# 2b. strip cvui block from ~/.zshrc (including its header comments + surrounding blank lines)
 zshrc="$HOME/.zshrc"
-if [[ -f $zshrc ]] && grep -q '# KSUI-BEGIN' "$zshrc"; then
-  tmp="${zshrc}.ksui.tmp"
+if [[ -f $zshrc ]] && grep -q '# cvui-BEGIN' "$zshrc"; then
+  tmp="${zshrc}.cvui.tmp"
   awk '
-    # Header comments that precede # KSUI-BEGIN — buffer them so we can drop them
+    # Header comments that precede # cvui-BEGIN — buffer them so we can drop them
     /^# ─+$/        { hdr[++h]=$0; next }
-    /^# KSUI block/ { hdr[++h]=$0; next }
+    /^# cvui block/ { hdr[++h]=$0; next }
     /^# Everything/ { hdr[++h]=$0; next }
-    /# KSUI-BEGIN/  { in_block=1; h=0; next }
-    /# KSUI-END/    { in_block=0; next }
+    /# cvui-BEGIN/  { in_block=1; h=0; next }
+    /# cvui-END/    { in_block=0; next }
     !in_block {
       if (h) { for (i=1;i<=h;i++) print hdr[i]; h=0 }
       print
@@ -89,7 +89,7 @@ if [[ -f $zshrc ]] && grep -q '# KSUI-BEGIN' "$zshrc"; then
   sed -i -e :a -e '/^$/{$d;N;ba' -e '}' "$tmp" 2>/dev/null || \
     sed -i '' -e :a -e '/^$/{$d;N;ba' -e '}' "$tmp" 2>/dev/null || true
   mv "$tmp" "$zshrc"
-  say "Removed KSUI block from $zshrc"
+  say "Removed cvui block from $zshrc"
 fi
 command -v termux-reload-settings >/dev/null 2>&1 && \
   termux-reload-settings 2>/dev/null && say "Termux settings reloaded"
@@ -114,6 +114,6 @@ else
 fi
 
 echo
-say "KSUI uninstalled. Dependencies left untouched."
+say "cvui uninstalled. Dependencies left untouched."
 info "If you want to remove a specific dependency, do it manually, e.g.:"
 info "  pkg uninstall tgpt"

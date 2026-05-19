@@ -1,8 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI logo — colors follow the active theme (~/.ksui/theme).
+# cvui logo — colors follow the active theme (~/.cvui/theme).
 
-_theme="ksui"
-[[ -r "$HOME/.ksui/theme" ]] && _theme=$(<"$HOME/.ksui/theme")
+_theme="cvui"
+[[ -r "$HOME/.cvui/theme" ]] && _theme=$(<"$HOME/.cvui/theme")
 
 case "$_theme" in
   forest)
@@ -23,10 +23,10 @@ case "$_theme" in
 esac
 R=$'\033[0m'
 
-# If the user has set a custom banner via `ksui banner <text>`, prefer it.
-_KSUI_HOME_GUESS="${KSUI_HOME:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
-_KSUI_CUSTOM_BANNER="$_KSUI_HOME_GUESS/assets/banner.txt"
-if [[ -s $_KSUI_CUSTOM_BANNER ]]; then
+# If the user has set a custom banner via `cvui banner <text>`, prefer it.
+_cvui_HOME_GUESS="${cvui_HOME:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+_cvui_CUSTOM_BANNER="$_cvui_HOME_GUESS/assets/banner.txt"
+if [[ -s $_cvui_CUSTOM_BANNER ]]; then
   echo
   _row=0
   while IFS= read -r _line || [[ -n $_line ]]; do
@@ -34,12 +34,12 @@ if [[ -s $_KSUI_CUSTOM_BANNER ]]; then
     else                     printf '%s%s%s\n' "$D" "$_line" "$R"
     fi
     _row=$((_row + 1))
-  done < "$_KSUI_CUSTOM_BANNER"
-  printf '                     %s⚡ Kashsight • KAI UI ⚡%s\n\n' "$O" "$R"
-  unset _KSUI_HOME_GUESS _KSUI_CUSTOM_BANNER _line _row _theme
+  done < "$_cvui_CUSTOM_BANNER"
+  printf '                     %s⚡ cybervaultke • KAI UI ⚡%s\n\n' "$O" "$R"
+  unset _cvui_HOME_GUESS _cvui_CUSTOM_BANNER _line _row _theme
   exit 0
 fi
-unset _KSUI_HOME_GUESS _KSUI_CUSTOM_BANNER
+unset _cvui_HOME_GUESS _cvui_CUSTOM_BANNER
 
 cat <<EOF
 
@@ -49,7 +49,7 @@ ${D} █████╔╝ ███████║███████╗█�
 ${D} ██╔═██╗ ██╔══██║╚════██║██╔══██║    ╚════██║██║██║   ██║██╔══██║   ██║
 ${D} ██║  ██╗██║  ██║███████║██║  ██║    ███████║██║╚██████╔╝██║  ██║   ██║
 ${D} ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝    ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝${R}
-                     ${O}⚡ Kashsight • KAI UI ⚡${R}
+                     ${O}⚡ cybervaultke • KAI UI ⚡${R}
 
 EOF
 unset _theme

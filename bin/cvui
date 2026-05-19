@@ -1,27 +1,27 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI — Kashsight UI shell (JARVIS-inspired)
-# https://github.com/kashsightplatform/ksui
+# cvui — cybervaultke UI shell (JARVIS-inspired)
+# https://github.com/cybervaultkeplatform/cvui
 
 set -u
 
 # Resolve repo root (supports symlinked install)
 _self="${BASH_SOURCE[0]}"
 while [[ -L $_self ]]; do _self="$(readlink "$_self")"; done
-KSUI_HOME="$(cd "$(dirname "$_self")/.." && pwd)"
-export KSUI_HOME
+cvui_HOME="$(cd "$(dirname "$_self")/.." && pwd)"
+export cvui_HOME
 
 # shellcheck disable=SC1091
-source "$KSUI_HOME/lib/ui.sh"
-source "$KSUI_HOME/lib/voice.sh"
-source "$KSUI_HOME/lib/sound.sh"
-source "$KSUI_HOME/lib/auth.sh"
-source "$KSUI_HOME/lib/commands.sh"
-[[ -f "$KSUI_HOME/lib/banner.sh" ]] && source "$KSUI_HOME/lib/banner.sh"
+source "$cvui_HOME/lib/ui.sh"
+source "$cvui_HOME/lib/voice.sh"
+source "$cvui_HOME/lib/sound.sh"
+source "$cvui_HOME/lib/auth.sh"
+source "$cvui_HOME/lib/commands.sh"
+[[ -f "$cvui_HOME/lib/banner.sh" ]] && source "$cvui_HOME/lib/banner.sh"
 
-export KSUI_VOICE="${KSUI_VOICE:-1}"
-export KSUI_SOUNDS="${KSUI_SOUNDS:-1}"
+export cvui_VOICE="${cvui_VOICE:-1}"
+export cvui_SOUNDS="${cvui_SOUNDS:-1}"
 
-ksui::boot_sequence() {
+cvui::boot_sequence() {
   clear
   ui::banner           # full motd: logo + sysinfo + datetime + disk
   sound::power_on
@@ -33,8 +33,8 @@ ksui::boot_sequence() {
     "handshake with tgpt"
     "authentication ready"
   )
-  # Fast path: skip per-step animation when KSUI_FAST_BOOT=1 (default on)
-  if [[ ${KSUI_FAST_BOOT:-1} -eq 1 ]]; then
+  # Fast path: skip per-step animation when cvui_FAST_BOOT=1 (default on)
+  if [[ ${cvui_FAST_BOOT:-1} -eq 1 ]]; then
     for s in "${steps[@]}"; do ui::say_status OK "$s"; done
   else
     for s in "${steps[@]}"; do
@@ -53,7 +53,7 @@ ksui::boot_sequence() {
   fi
 }
 
-ksui::post_login() {
+cvui::post_login() {
   clear
   ui::banner
   voice::greet
@@ -61,7 +61,7 @@ ksui::post_login() {
   printf "\n  ${C_DIM}Type ${C_RESET}${C_GREEN}help${C_RESET}${C_DIM} for commands. ${C_RESET}${C_GREEN}exit${C_RESET}${C_DIM} to leave.${C_RESET}\n\n"
 }
 
-ksui::repl() {
+cvui::repl() {
   local line cmd args
   while :; do
     ui::prompt_char
@@ -91,20 +91,21 @@ ksui::repl() {
       doctor)       cmd::doctor ;;
       motd)         ui::banner ;;
       banner)       cmd::banner $args ;;
-      time|date)    date ;;
+      time|date)    cmd::time ;;
       ls)           ui::ls $args ;;
       ll)           ui::ll $args ;;
       cd)           cd "${args:-$HOME}" || ui::say_status ERR "cd failed" ;;
       clear|cls)    clear; ui::banner ;;
       voice)        cmd::voice_toggle $args ;;
       theme)        cmd::theme $args ;;
+      noauth)       cmd::noauth $args ;;
       update)       cmd::update ;;
       whoami)       cmd::whoami ;;
       reset-auth)   auth::reset; exit 0 ;;
       exit|quit|bye)
         voice::bye
         sound::power_off
-        ui::say_status INFO "Shutting down KSUI…"
+        ui::say_status INFO "Shutting down cvui…"
         sleep 0.6
         break
         ;;
@@ -115,35 +116,41 @@ ksui::repl() {
   done
 }
 
-ksui::usage() {
+cvui::usage() {
   cat <<EOF
-ksui — Kashsight UI shell
+cvui — cybervaultke UI shell
 
 USAGE:
-  ksui                       Launch interactive shell (login + REPL)
-  ksui ask <question...>     One-shot: ask KAI, print answer, exit
-  ksui joke | fact           One-shot: joke / fact (tgpt)
-  ksui news                  Top headlines (Hacker News)
-  ksui crypto [coin]         Crypto price (CoinGecko)
-  ksui ip                    Public IP + geo
-  ksui define <word>         Dictionary lookup
-  ksui weather [city]        Current weather (wttr.in)
-  ksui sysinfo               System info
-  ksui qr <text>             Render a terminal QR code
-  ksui note <text>           Append a timestamped note
-  ksui notes                 Show all notes
-  ksui todo [text|done N]    Todo list
-  ksui timer <minutes>       Pomodoro timer
-  ksui doctor                Audit optional deps + KSUI health
-  ksui motd                  Print the motd banner
-  ksui banner <text>         Build custom banner (letters/digits only)
-  ksui update                Pull latest + re-run installer
-  ksui theme [name]          List / switch prompt themes
+  cvui                       Launch interactive shell (login + REPL)
+  cvui ask <question...>     One-shot: ask KAI, print answer, exit
+  cvui joke | fact           One-shot: joke / fact (tgpt)
+  cvui news                  Top headlines (Hacker News)
+  cvui crypto [coin]         Crypto price (CoinGecko)
+  cvui ip                    Public IP + geo
+  cvui define <word>         Dictionary lookup
+  cvui weather [city]        Current weather (wttr.in)
+  cvui sysinfo               System info
+  cvui qr <text>             Render a terminal QR code
+  cvui note <text>           Append a timestamped note
+  cvui notes                 Show all notes
+  cvui todo [text|done N]    Todo list
+  cvui timer <minutes>       Pomodoro timer
+  cvui time                 Live clock with hacker UI
+  cvui calc <expr>          Calculator
+  cvui bible <ref>          Bible verse lookup
+  cvui apps                 List available cvui apps
+  cvui doctor                Audit optional deps + cvui health
+  cvui motd                  Print the motd banner
+  cvui banner <text>         Build custom banner (letters/digits only)
+  cvui update                Pull latest + re-run installer
+  cvui theme [name]          List / switch prompt themes
+  cvui noauth [on|off]       Toggle session lock (auth)
 
 FLAGS:
   --no-voice      Start with voice muted
   --no-sounds     Disable sound effects
   --reset-auth    Clear saved credentials
+  --no-auth       Skip authentication for this session
   --version, -v   Print version
   --help, -h      Print this help
 EOF
@@ -154,17 +161,18 @@ main() {
   local passthrough=()
   while (( $# )); do
     case "${1:-}" in
-      --version|-v) echo "ksui 0.3.0"; exit 0 ;;
-      --help|-h)    ksui::usage; exit 0 ;;
+      --version|-v) echo "cvui 0.3.0"; exit 0 ;;
+      --help|-h)    cvui::usage; exit 0 ;;
       --reset-auth) auth::reset; exit 0 ;;
-      --no-voice)   export KSUI_VOICE=0; shift ;;
-      --no-sounds)  export KSUI_SOUNDS=0; shift ;;
+      --no-voice)   export cvui_VOICE=0; shift ;;
+      --no-sounds)  export cvui_SOUNDS=0; shift ;;
+      --no-auth)    export cvui_NO_AUTH=1; shift ;;
       *)            passthrough+=("$1"); shift ;;
     esac
   done
   set -- "${passthrough[@]:-}"
 
-  # One-shot mode: `ksui ask ...`, `ksui joke`, etc.
+  # One-shot mode: `cvui ask ...`, `cvui joke`, etc.
   case "${1:-}" in
     ask)       shift; cmd::ask "$@"; exit $? ;;
     joke)      cmd::joke; exit $? ;;
@@ -181,21 +189,24 @@ main() {
     notes)     cmd::notes; exit $? ;;
     todo)      shift; cmd::todo "$@"; exit $? ;;
     timer)     shift; cmd::timer "$@"; exit $? ;;
+    calc)      shift; cmd::calc "$@"; exit $? ;;
+    bible)     shift; cmd::bible "$@"; exit $? ;;
+    apps)      cmd::apps; exit 0 ;;
     doctor)    cmd::doctor; exit $? ;;
     motd)      ui::banner; exit 0 ;;
     banner)    shift; cmd::banner "$@"; exit $? ;;
     update)    cmd::update; exit $? ;;
     theme)     shift; cmd::theme "$@"; exit $? ;;
     "")        : ;;
-    *)         ksui::usage; exit 1 ;;
+    *)         cvui::usage; exit 1 ;;
   esac
 
   # Interactive mode
-  export KSUI_REPL=1
-  ksui::boot_sequence
-  auth::login || exit 1
-  ksui::post_login
-  ksui::repl
+  export cvui_REPL=1
+  cvui::boot_sequence
+  [[ ${cvui_NO_AUTH:-0} -eq 1 || -f "$HOME/.cvui/no-lock" ]] || auth::login || exit 1
+  cvui::post_login
+  cvui::repl
 }
 
 main "$@"

@@ -1,9 +1,9 @@
-# KSUI Architecture
+# cvui Architecture
 
 ```
-ksui/
+cvui/
 ├── bin/
-│   └── ksui                  # entrypoint: one-shots OR boot → login → REPL
+│   └── cvui                  # entrypoint: one-shots OR boot → login → REPL
 ├── lib/
 │   ├── ui.sh                 # colors, banners, ls/ll wrappers, status ticks
 │   ├── voice.sh              # espeak / festival / termux-tts abstraction
@@ -11,7 +11,7 @@ ksui/
 │   ├── auth.sh               # first-run setup + login (sha256, 0600 file)
 │   └── commands.sh           # REPL command implementations
 ├── assets/
-│   ├── banner.txt            # small KSUI ASCII logo
+│   ├── banner.txt            # small cvui ASCII logo
 │   ├── colors.properties     # KAI-blue Termux theme
 │   ├── termux.properties     # 3-row extra-keys layout
 │   ├── memes.txt             # bundled meme URLs (offline fallback)
@@ -19,19 +19,19 @@ ksui/
 ├── motd/
 │   ├── init.sh               # runs motd.d/NN-* in order
 │   └── motd.d/
-│       ├── 10-ksui-logo      # big KASHSIGHT banner
+│       ├── 10-cvui-logo      # big cybervaultke banner
 │       ├── 20-sysinfo        # distro/host/kernel/load/mem/cpu
 │       └── 35-diskspace      # filtered disk-usage (compact)
 ├── zsh/
 │   ├── ksh.zsh               # the KSH framework (replaces oh-my-zsh)
-│   ├── zshrc.template        # the managed # KSUI-BEGIN/END block
+│   ├── zshrc.template        # the managed # cvui-BEGIN/END block
 │   ├── plugins/
 │   │   ├── autosuggestions/  # → / Ctrl-F to accept
 │   │   ├── syntax-highlighting/ # token-classifying highlighter
 │   │   ├── z/                # frecent directory jump
 │   │   └── fzf/              # Ctrl-R, Ctrl-T, Alt-C
 │   └── themes/
-│       ├── ksui.zsh-theme    # KAI-blue 2-line (default)
+│       ├── cvui.zsh-theme    # KAI-blue 2-line (default)
 │       ├── minimal.zsh-theme # single-line, no git
 │       └── cyberpunk.zsh-theme # neon magenta/green
 ├── install/
@@ -45,14 +45,14 @@ ksui/
 ## Design principles
 
 1. **Non-destructive by default.** The installer only installs *missing*
-   packages; the uninstaller only removes KSUI's own files and restores
-   `.ksui-backup` files. Shared tools are never touched because other
+   packages; the uninstaller only removes cvui's own files and restores
+   `.cvui-backup` files. Shared tools are never touched because other
    projects on the user's machine may depend on them.
 
 2. **Vendor everything.** No runtime dependency on external git repos
    (oh-my-zsh, powerlevel10k, termux-motd, zsh-autosuggestions,
    zsh-syntax-highlighting, z). We own the code, users get fewer
-   surprises, updates are atomic via `ksui update`.
+   surprises, updates are atomic via `cvui update`.
 
 3. **Degrade gracefully.** Every optional dependency is gated by
    `command -v`. If `espeak` isn't present, the UI is silent but still
@@ -60,44 +60,44 @@ ksui/
    If `fzf` isn't present, Ctrl-R falls back to zsh default.
 
 4. **Stay out of the user's way.** Unknown REPL input is passed straight
-   to the shell via `eval`, so KSUI never blocks a workflow the user
+   to the shell via `eval`, so cvui never blocks a workflow the user
    already has.
 
 5. **Local-only auth.** Passwords are sha256-hashed and stored at
-   `~/.ksui/auth` with `0600`. No network, no telemetry.
+   `~/.cvui/auth` with `0600`. No network, no telemetry.
 
 6. **Managed .zshrc block.** Everything the installer adds lives inside
-   `# KSUI-BEGIN ... # KSUI-END`. The uninstaller removes the block
+   `# cvui-BEGIN ... # cvui-END`. The uninstaller removes the block
    cleanly, including its header comments.
 
 ## Launch flow
 
-### Interactive (`ksui`)
+### Interactive (`cvui`)
 ```
-ksui
+cvui
   ├─ boot sequence  (motd banner + power-on sweep + fake init ticks, 1s)
   ├─ auth::login    (first run → auth::setup; 3 attempts → lockout)
   ├─ post-login     (motd banner + voice::greet + maker intro)
   └─ REPL           (dispatch → command modules → shell fallthrough)
 ```
 
-### One-shot (`ksui ask <q>`, `ksui joke`, …)
+### One-shot (`cvui ask <q>`, `cvui joke`, …)
 ```
-ksui <subcommand> [args...]
+cvui <subcommand> [args...]
   └─ skip boot/login/REPL → run one command → exit
 ```
 
-## Extending KSUI
+## Extending cvui
 
 Add a new command:
 
 1. Add a `cmd::mything()` function to `lib/commands.sh`.
-2. Add a dispatch case to `ksui::repl` in `bin/ksui` (for the REPL).
+2. Add a dispatch case to `cvui::repl` in `bin/cvui` (for the REPL).
 3. If the command should also work as a one-shot, add a case to the
-   `main()` switch in `bin/ksui`.
+   `main()` switch in `bin/cvui`.
 4. Add the command to `cmd::help` and the README.
 
 Add a new prompt theme:
 
 1. Drop `zsh/themes/<name>.zsh-theme` that sets `PROMPT` / `RPROMPT`.
-2. Users switch via `ksui theme <name>`.
+2. Users switch via `cvui theme <name>`.

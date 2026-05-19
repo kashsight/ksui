@@ -1,10 +1,10 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# Shared theme palette for KSUI motd scripts. Sourced (not executed)
-# by 10-ksui-logo / 20-sysinfo / 35-diskspace so the banner subtitle,
-# label colors, and disk-bar tones all stay in sync with ~/.ksui/theme.
+# Shared theme palette for cvui motd scripts. Sourced (not executed)
+# by 10-cvui-logo / 20-sysinfo / 35-diskspace so the banner subtitle,
+# label colors, and disk-bar tones all stay in sync with ~/.cvui/theme.
 #
 # Themes:
-#   ksui     (default)  sky-blue / cyan
+#   cvui     (default)  sky-blue / cyan
 #   forest              dark green
 #   sky                 sky-blue
 #   minimal             monochrome grey (everything dim/grey)
@@ -12,8 +12,8 @@
 # Exports: T_PRIMARY, T_SECONDARY, T_ACCENT, T_OK, T_WARN, T_BAD,
 #          T_LABEL, T_VALUE, T_DIM, T_BOLD, T_RESET
 
-_t="ksui"
-[[ -r "$HOME/.ksui/theme" ]] && _t=$(<"$HOME/.ksui/theme")
+_t="cvui"
+[[ -r "$HOME/.cvui/theme" ]] && _t=$(<"$HOME/.cvui/theme")
 
 case "$_t" in
   forest)
@@ -35,7 +35,7 @@ case "$_t" in
     T_OK=$'\e[38;5;250m'        # numeric values stay grey too
     ;;
   *)
-    # ksui (default) — cyan / blue
+    # cvui (default) — cyan / blue
     T_PRIMARY=$'\e[38;5;51m'    # cyan
     T_SECONDARY=$'\e[38;5;39m'  # blue
     T_ACCENT=$'\e[38;5;215m'    # orange

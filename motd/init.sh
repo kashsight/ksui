@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI motd — vendored from GR3YH4TT3R93/termux-motd, re-implemented
-# in bash (no zsh dependency) and branded as Kashsight.
+# cvui motd — vendored from GR3YH4TT3R93/termux-motd, re-implemented
+# in bash (no zsh dependency) and branded as cybervaultke.
 #
 # Runs every motd.d/NN-* script in numeric order, skipping .disabled.
 

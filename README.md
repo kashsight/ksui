@@ -1,7 +1,7 @@
-# KSUI — Kashsight UI
+# cvui — cybervaultke UI (Proprietary In-House Edition)
 
-> A KAI-inspired Termux shell UI + zsh framework, made by **Kashsight**.
-> Big motd banner with live sysinfo/time/disk panels, voice greetings, `tgpt`-powered commands, fzf keybinds, three prompt themes, and a safe non-destructive installer.
+> A KAI-inspired Termux shell UI + zsh framework, made by **cybervaultke**.
+> Everything is custom-made in-house: proprietary font, custom history search, and iconified tools.
 
 ```
  ██╗  ██╗ █████╗ ███████╗██╗  ██╗    ███████╗██╗ ██████╗ ██╗  ██╗████████╗
@@ -10,199 +10,87 @@
  ██╔═██╗ ██╔══██║╚════██║██╔══██║    ╚════██║██║██║   ██║██╔══██║   ██║
  ██║  ██╗██║  ██║███████║██║  ██║    ███████║██║╚██████╔╝██║  ██║   ██║
  ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝    ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝
-                     ⚡ Kashsight • KAI UI ⚡
+                     ⚡ cybervaultke • KAI UI ⚡
 ```
 
 ---
 
-## ✨ What you get
+## ✨ Proprietary Features
 
-**The `ksui` app** (interactive KAI shell):
-- 🔐 First-run account setup with sha256-hashed local credentials
-- 🤖 KAI voice greeting on every login (`espeak` / `festival` / termux-tts)
-- 🎨 Full motd-style banner: system info + date/time + disk panels
-- 🔊 Sox-synthesized sound effects (boot sweep, beeps, access chime)
-- 🧠 Commands backed by `tgpt`: `ask`, `joke`, `fact`
-- 🖼 Memes, weather (`wttr.in`), sysinfo (`neofetch`)
+**Proprietary In-House Shell**:
+- 🔐 **Authentication**: First-run account setup with sha256-hashed local credentials.
+- 🗣 **KAI Voice**: Live TTS for greetings, jokes, facts, and creative timer alerts.
+- 📁 **Custom `ls`**: Iconified file listing (📂, 🏗, 📄) built directly into the shell (no `lsd` required).
+- 🔍 **History Search**: Custom in-house history prefix search via Up/Down arrows.
+- ⚡ **Zero Bloat**: All unnecessary Python build tools and external libraries removed.
 
-**KSH — our own zsh framework** (replaces oh-my-zsh):
-- 📁 Iconified `ls`/`ll`/`la`/`lt` via `lsd`
-- 💡 Autosuggestions (→ / Ctrl-F to accept)
-- 🎨 Syntax highlighting (green/red for valid/invalid commands)
-- 📍 `z` frecent directory jump
-- 🔍 **fzf** Ctrl-R history, Ctrl-T files, Alt-C cd — all with preview
-- 🎭 Three prompt themes: `ksui` (KAI-blue), `minimal`, `cyberpunk`
-
-**Zero external runtime deps** — we vendor everything. No oh-my-zsh, no powerlevel10k, no external motd repo.
+**Proprietary cvui System Font**:
+- 🖋 **Classic Look**: Text displays in a clear, readable style similar to **Times New Roman**.
+- 🛠 **Icon Support**: Full support for emojis, icons, and glyphs (Nerd Font compatible).
+- 📐 **Lines Support**: Native support for box-drawing characters and UI lines.
+- 📦 **Bundled**: The font is proprietary and comes bundled with the installation (`assets/fonts/cvui.ttf`).
 
 ---
 
-## 🚀 Install
+## 🚀 Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kashsight/ksui/main/install/install.sh | bash
+pkg update && pkg upgrade -y && pkg install git -y && git clone https://github.com/cybervaultke/cvui.git && cd cvui/install && bash install.sh
 ```
 
 The installer:
-1. Installs missing packages (git, curl, lsd, tgpt, espeak, sox, fzf, …) — **never touches versions you already have**
-2. Downloads FiraCode Nerd Font (for icons + glyphs), backing up existing `~/.termux/font.ttf`
-3. Drops our KAI-blue `colors.properties` + 3-row extra-keys layout (both backed up)
-4. Patches a managed `# KSUI-BEGIN/END` block into `~/.zshrc`
-5. Symlinks `ksui` into `$PREFIX/bin`
+1. Installs minimal system packages (git, python, tgpt, espeak, sox, ...).
+2. Deploys the proprietary **`cvui.ttf`** system font to `~/.termux/font.ttf`.
+3. Drops the KAI-blue `colors.properties` and 3-row extra-keys layout.
+4. Sets up the custom-made **KSH** zsh framework.
+5. Symlinks `cvui` into your PATH.
 
 Then run:
 
 ```bash
-ksui            # interactive login + REPL
-ksui --help     # all modes
+cvui            # Launch interactive REPL
+cvui --help     # Show one-shot modes
 ```
 
 ---
 
-## 🗣 Commands — interactive REPL
+## 🗣 KAI Commands
 
 ```
-help                Show the command menu
-about               Maker intro + socials
-ask <q...>          Ask KAI anything (tgpt)
-joke / fact         AI-generated joke / fun fact
-meme                Random meme (with bundled fallback)
+ask <q...>          Ask KAI anything (AI-powered)
+joke / fact         AI-generated (KAI speaks the response!)
+timer <min>         Pomodoro timer with creative voice alerts
 weather [city]      Weather via wttr.in
-sysinfo             Full system info (neofetch)
+sysinfo             Proprietary system info panel
 motd                Reprint the banner
-time / date         Current date & time
-ls / ll / cd / clear  (as expected)
-voice on|off        Toggle KAI voice
-theme [name]        List or switch prompt themes
-update              git pull + re-run installer
-whoami              Show current KSUI user
-reset-auth          Reset username/password
-exit / quit         Shut down
-```
-
-Anything else is passed to your shell.
-
----
-
-## ⚡ One-shot mode (no login, no REPL)
-
-```bash
-ksui ask "what's a zsh completion function?"
-ksui joke
-ksui weather nairobi
-ksui sysinfo
-ksui motd                  # just the banner
-ksui theme                 # list themes
-ksui theme cyberpunk       # switch
-ksui update                # self-update
+time / date         Live clock and date
+ls / ll / la        Custom iconified file listing
+theme [name]        Switch prompt themes
+noauth [on|off]     Toggle session lock (auth)
+update              Pull latest proprietary updates
+exit / quit         Shut down cvui
 ```
 
 ---
 
-## 🎭 Prompt themes (switch anytime)
-
-| Theme | Style |
-|---|---|
-| `ksui` (default) | 2-line KAI-blue, cyan path + orange git branch |
-| `minimal` | Single-line `%1~ ❯`, no git |
-| `cyberpunk` | Neon magenta/green, `user@host` + exit code + duration |
-
-```bash
-ksui theme cyberpunk
-exec zsh            # reload the prompt
-```
-
----
-
-## ⌨️ fzf keybinds (in any KSH shell)
+## ⌨️ Custom Key Bindings
 
 | Key | Action |
 |---|---|
-| `Ctrl-R` | Fuzzy history search |
-| `Ctrl-T` | Fuzzy file picker (with preview), inserts path at cursor |
-| `Alt-C` | Fuzzy `cd` |
-
-Requires `fzf` (and optionally `fd` for speed) — installed automatically.
-
----
-
-## 🧩 Dependencies
-
-The installer installs these **only if missing** and never downgrades:
-
-| Tool | Used for | Required? |
-|---|---|---|
-| `bash`, `zsh` | the scripts themselves | ✅ |
-| `git`, `curl`, `unzip` | install / update / assets | ✅ |
-| `lsd` | iconified `ls`/`ll` | recommended |
-| `tgpt` | `ask` / `joke` / `fact` | recommended |
-| `fzf`, `fd` | Ctrl-R / Ctrl-T / Alt-C | recommended |
-| `espeak` | KAI voice | optional |
-| `sox` | sound effects | optional |
-| `figlet`, `lolcat`, `neofetch` | pretty extras | optional |
-| `openssl` | password hashing (falls back to `sha256sum`) | optional |
-
-KSUI **degrades gracefully** — every optional dep is guarded by `command -v`.
-
----
-
-## 🗑 Uninstall (safe, reversible)
-
-```bash
-bash ~/.ksui-app/install/uninstall.sh            # keep credentials
-bash ~/.ksui-app/install/uninstall.sh --purge    # wipe credentials too
-```
-
-Uninstall:
-- ✅ Removes KSUI's install dir + the `ksui` symlink
-- ✅ Restores original `~/.termux/font.ttf`, `colors.properties`, `termux.properties` from `.ksui-backup`
-- ✅ Strips the managed `# KSUI-BEGIN/END` block from `~/.zshrc`
-- ❌ **Never** removes shared deps (`git`, `curl`, `tgpt`, `espeak`, `lsd`, `fzf`, …) — other projects depend on them
-
----
-
-## ⚙️ Environment variables
-
-| Var | Default | Purpose |
-|---|---|---|
-| `KSUI_VOICE` | `1` | Set `0` to start muted |
-| `KSUI_SOUNDS` | `1` | Set `0` to disable sox beeps |
-| `KSUI_CFG` | `~/.ksui` | Credentials + theme preference |
-| `KSUI_INSTALL_DIR` | `~/.ksui-app` | Repo install location |
-| `KSUI_REPO` | upstream git URL | Override to install from a fork |
-| `KSUI_SKIP_FONT` / `_COLORS` / `_KEYS` / `_KSH` / `_MOTD` | `0` | Opt-out toggles for installer |
-| `KSH_SKIP_HISTORY` / `_COMPLETION` / `_AUTOSUGGEST` / `_SYNTAX` / `_Z` / `_FZF` / `_THEME` / `_ALIASES` / `_MOTD` | `0` | Opt-out toggles for KSH framework |
-
----
-
-## 🏗 Architecture
-
-```
-ksui/
-├── bin/ksui              entrypoint: one-shot modes OR boot → login → REPL
-├── lib/                  ui / voice / sound / auth / commands
-├── motd/                 logo + sysinfo + datetime + disk (our own, bash)
-├── zsh/
-│   ├── ksh.zsh           the KSH framework (replaces oh-my-zsh)
-│   ├── plugins/          autosuggestions, syntax-highlighting, z, fzf
-│   ├── themes/           ksui, minimal, cyberpunk
-│   └── zshrc.template    the KSUI-BEGIN/END block
-├── assets/               banner, KAI-blue colors, extra-keys, memes
-└── install/              install.sh + uninstall.sh
-```
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design principles.
+| `Up Arrow` | Search history (prefix match) |
+| `Down Arrow` | Search history (prefix match) |
+| `Ctrl+F` | Accept autosuggestion |
+| `Alt+F` | Accept one word of suggestion |
 
 ---
 
 ## 👤 Maker
 
-Made with ⚡ by **KASHSIGHT**
+Made with ⚡ by **cybervaultke**
 
-- 🎬 YouTube — [youtube.com/@kashsight](https://youtube.com/@kashsight)
-- 📸 Instagram — [instagram.com/kashsight](https://instagram.com/kashsight)
-- 📘 Facebook — [facebook.com/kashsight](https://facebook.com/kashsight)
-- 💻 GitHub — [github.com/kashsight](https://github.com/kashsight)
+- 🎬 YouTube — [youtube.com/@cybervaultke](https://youtube.com/@cybervaultke)
+- 📸 Instagram — [instagram.com/cybervaultke](https://instagram.com/cybervaultke)
+- 💻 GitHub — [github.com/cybervaultke](https://github.com/cybervaultke)
 
 ---
 

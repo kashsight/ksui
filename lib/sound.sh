@@ -1,9 +1,9 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI — sound fx (sox-synthesized, no binary assets needed)
+# cvui — sound fx (sox-synthesized, no binary assets needed)
 # Uses `play` (sox). Silent fallback if sox isn't installed.
 
 sound::_play() {
-  [[ ${KSUI_SOUNDS:-1} -eq 0 ]] && return 0
+  [[ ${cvui_SOUNDS:-1} -eq 0 ]] && return 0
   command -v play >/dev/null 2>&1 || return 0
   play -nq -t alsa "$@" 2>/dev/null &
 }

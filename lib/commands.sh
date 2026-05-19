@@ -1,13 +1,13 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI — built-in commands
+# cvui — built-in commands
 
 cmd::help() {
   cat <<EOF
 
-${C_CYAN}${C_BOLD}KSUI Commands${C_RESET}
+${C_CYAN}${C_BOLD}cvui Commands${C_RESET}
 ${C_GRAY}──────────────────────────────${C_RESET}
   ${C_GREEN}help${C_RESET}           Show this menu
-  ${C_GREEN}about${C_RESET}          About the maker (Kashsight)
+  ${C_GREEN}about${C_RESET}          About the maker (cybervaultke)
   ${C_GREEN}ask${C_RESET} <q...>     Ask KAI anything (uses tgpt)
   ${C_GREEN}joke${C_RESET}           Tell a joke (tgpt, random topic)
   ${C_GREEN}fact${C_RESET}           Random fun fact (tgpt, random topic)
@@ -23,7 +23,11 @@ ${C_GRAY}───────────────────────�
   ${C_GREEN}notes${C_RESET}          Show all notes
   ${C_GREEN}todo${C_RESET} [text]    Add/list todo items (todo done N to check off)
   ${C_GREEN}timer${C_RESET} <min>    Pomodoro timer with voice alert
-  ${C_GREEN}doctor${C_RESET}         Audit optional deps + KSUI health
+  ${C_GREEN}time${C_RESET}       Live clock with hacker UI
+  ${C_GREEN}calc${C_RESET}       Terminal calculator
+  ${C_GREEN}bible${C_RESET}      Bible verse lookup
+  ${C_GREEN}apps${C_RESET}       Launcher listing cvui apps
+  ${C_GREEN}doctor${C_RESET}         Audit optional deps + cvui health
   ${C_GREEN}motd${C_RESET}           Reprint the banner
   ${C_GREEN}banner${C_RESET} <text>   Build a custom banner (a-z/0-9 only)
   ${C_GREEN}time${C_RESET} / ${C_GREEN}date${C_RESET}    Current date and time
@@ -32,10 +36,11 @@ ${C_GRAY}───────────────────────�
   ${C_GREEN}clear${C_RESET} / ${C_GREEN}cls${C_RESET}   Clear screen
   ${C_GREEN}voice${C_RESET} on|off   Toggle KAI voice
   ${C_GREEN}theme${C_RESET} [name]   List / switch prompt theme
+  ${C_GREEN}noauth${C_RESET} on|off  Toggle session lock (auth)
   ${C_GREEN}update${C_RESET}         git pull + re-run installer
   ${C_GREEN}whoami${C_RESET}         Show logged-in user
   ${C_GREEN}reset-auth${C_RESET}     Reset username/password
-  ${C_GREEN}exit${C_RESET} / ${C_GREEN}quit${C_RESET}   Shut down KSUI
+  ${C_GREEN}exit${C_RESET} / ${C_GREEN}quit${C_RESET}   Shut down cvui
 ${C_GRAY}──────────────────────────────${C_RESET}
 Any other input is passed to your shell.
 
@@ -76,7 +81,7 @@ cmd::joke() {
   local t=${topics[RANDOM % ${#topics[@]}]}
   local nonce=$RANDOM
   printf "${C_YELLOW}😄${C_RESET} "
-  tgpt "Tell me ONE fresh short clean genuinely funny joke about $t. Different from your last one. Just the joke, no preamble. [seed=$nonce]"
+  local joke; joke=$(tgpt "Tell me ONE fresh short clean genuinely funny joke about $t. Different from your last one. Just the joke, no preamble. [seed=$nonce]" 2>/dev/null); printf "%s\n" "$joke"; voice::say "$joke"
 }
 
 cmd::fact() {
@@ -87,7 +92,7 @@ cmd::fact() {
   local t=${topics[RANDOM % ${#topics[@]}]}
   local nonce=$RANDOM
   printf "${C_CYAN}💡${C_RESET} "
-  tgpt "Give me ONE surprising fun fact about $t in 1-2 sentences. Something most people don't know. No preamble. [seed=$nonce]"
+  local fact; fact=$(tgpt "Give me ONE surprising fun fact about $t in 1-2 sentences. Something most people don't know. No preamble. [seed=$nonce]" 2>/dev/null); printf "%s\n" "$fact"; voice::say "$fact"
 }
 
 cmd::meme() {
@@ -96,9 +101,9 @@ cmd::meme() {
     url=$(curl -fsSL --max-time 5 https://meme-api.com/gimme 2>/dev/null | \
           grep -oE '"url":"[^"]+"' | head -n1 | cut -d'"' -f4)
   fi
-  if [[ -z $url && -f ${KSUI_HOME}/assets/memes.txt ]]; then
-    url=$(shuf -n1 "${KSUI_HOME}/assets/memes.txt" 2>/dev/null || \
-          awk 'NR==int(rand()*NR)+1' "${KSUI_HOME}/assets/memes.txt")
+  if [[ -z $url && -f ${cvui_HOME}/assets/memes.txt ]]; then
+    url=$(shuf -n1 "${cvui_HOME}/assets/memes.txt" 2>/dev/null || \
+          awk 'NR==int(rand()*NR)+1' "${cvui_HOME}/assets/memes.txt")
     ui::say_status INFO "Using bundled meme (API unreachable)"
   fi
   if [[ -z $url ]]; then
@@ -121,7 +126,7 @@ cmd::sysinfo() {
   if command -v neofetch >/dev/null 2>&1; then
     neofetch
   else
-    printf "User     : %s\n" "${KSUI_USER:-$USER}"
+    printf "User     : %s\n" "${cvui_USER:-$USER}"
     printf "Shell    : %s\n" "$SHELL"
     printf "Host     : %s\n" "$(uname -n)"
     printf "Kernel   : %s\n" "$(uname -sr)"
@@ -245,7 +250,7 @@ cmd::qr() {
 
 # ── note / notes ─────────────────────────────────────────────────────────
 cmd::note() {
-  local f="$HOME/.ksui/notes.md"
+  local f="$HOME/.cvui/notes.md"
   mkdir -p "$(dirname "$f")"
   local text="$*"
   if [[ -z $text ]]; then
@@ -257,7 +262,7 @@ cmd::note() {
 }
 
 cmd::notes() {
-  local f="$HOME/.ksui/notes.md"
+  local f="$HOME/.cvui/notes.md"
   if [[ ! -s $f ]]; then
     ui::say_status INFO "No notes yet. Add with: note <text>"
     return 0
@@ -268,7 +273,7 @@ cmd::notes() {
 
 # ── todo ─────────────────────────────────────────────────────────────────
 cmd::todo() {
-  local f="$HOME/.ksui/todo.md"
+  local f="$HOME/.cvui/todo.md"
   mkdir -p "$(dirname "$f")"
   touch "$f"
   local sub="${1:-}"
@@ -325,6 +330,7 @@ cmd::todo() {
 }
 
 # ── timer (pomodoro) ─────────────────────────────────────────────────────
+# ── timer (hacker‑styled countdown) ─────────────────────────────────
 cmd::timer() {
   local mins="${1:-25}"
   if ! [[ $mins =~ ^[0-9]+$ ]] || (( mins <= 0 )); then
@@ -332,29 +338,64 @@ cmd::timer() {
   fi
   local secs=$(( mins * 60 ))
   local end=$(( $(date +%s) + secs ))
-  ui::say_status INFO "Timer: ${mins}m. Ctrl-C to abort."
-  trap 'printf "\n"; ui::say_status WARN "Timer aborted."; trap - INT; return 130' INT
+  
+  # Weather‑style frame
+  local top="┌─────────────────────────────────────────────────────────────────┐"
+  local mid="├─────────────────────────────────────────────────────────────────┤"
+  local bot="└─────────────────────────────────────────────────────────────────┘"
+  
+  ui::say_status INFO "⚡ HACKER TIMER: ${mins}m session - Ctrl+C to abort"
+  printf "\n${C_CYAN}%s${C_RESET}\n" "$top"
+  printf "${C_CYAN}│${C_RESET}  ${C_GREEN}⏳ cvui TIMER${C_RESET}                                    ${C_CYAN}│${C_RESET}\n"
+  printf "${C_CYAN}%s${C_RESET}\n" "$mid"
+  
+  trap 'printf "\n${C_CYAN}%s${C_RESET}\n" "$bot"; ui::say_status WARN "⚠ Timer aborted."; trap - INT; return 130' INT
+  
   while (( $(date +%s) < end )); do
     local left=$(( end - $(date +%s) ))
-    printf "\r  ${C_CYAN}⏳${C_RESET} %02d:%02d remaining " $(( left / 60 )) $(( left % 60 ))
+    local perc=$(( ( (secs - left) * 100 ) / secs ))
+    local filled=$(( perc * 60 / 100 ))
+    local empty=$(( 60 - filled ))
+    
+    # Build gradient bar
+    local bar=""
+    for ((i=0; i<filled; i++)); do
+      if (( i < filled/3 )); then
+        bar+="${C_GREEN}█${C_RESET}"
+      elif (( i < filled*2/3 )); then
+        bar+="${C_YELLOW}▓${C_RESET}"
+      else
+        bar+="${C_RED}▒${C_RESET}"
+      fi
+    done
+    for ((i=0; i<empty; i++)); do
+      bar+="${C_DIM}░${C_RESET}"
+    done
+    
+    local min_left=$(( left / 60 )); local sec_left=$(( left % 60 ));
+    local time_str=$(printf "%02d:%02d" $min_left $sec_left)
+    
+    printf "${C_CYAN}│${C_RESET}  [${bar}] ${C_BOLD}%s${C_RESET}  ${C_YELLOW}%3d%%${C_RESET} ${C_CYAN}│${C_RESET}\r" "$time_str" "$perc"
     sleep 1
   done
-  trap - INT
-  printf "\r  ${C_GREEN}✔${C_RESET} Timer done!                 \n"
+  
+  printf "\n${C_CYAN}│${C_RESET}  ${C_BOLD}${C_GREEN}✔ TIMER COMPLETE!${C_RESET}                                   ${C_CYAN}│${C_RESET}\n"
+  printf "${C_CYAN}%s${C_RESET}\n\n" "$bot"
+
   if command -v voice::say >/dev/null 2>&1; then
-    voice::say "Timer complete, ${KSUI_USER:-sir}. ${mins} minutes elapsed."
+    local msgs=("Timer complete, ${cvui_USER:-sir}. Your ${mins} minute session has ended." "Focus session finished. Time to take a break, ${cvui_USER:-sir}." "The countdown has reached zero. Subsystems are standing by." "Alert. ${mins} minutes have elapsed. Task duration complete."); voice::say "${msgs[RANDOM % ${#msgs[@]}]}"
   fi
   if command -v sound::chime >/dev/null 2>&1; then sound::chime; fi
   if command -v termux-notification >/dev/null 2>&1; then
-    termux-notification -t "KSUI timer" -c "${mins}m elapsed" 2>/dev/null || true
+    termux-notification -t "cvui timer" -c "${mins}m elapsed" 2>/dev/null || true
   fi
 }
 
 # ── doctor (environment audit) ───────────────────────────────────────────
 cmd::doctor() {
-  printf "${C_CYAN}${C_BOLD}🩺 KSUI Doctor${C_RESET}\n"
+  printf "${C_CYAN}${C_BOLD}🩺 cvui Doctor${C_RESET}\n"
   printf "${C_GRAY}────────────────────────────────${C_RESET}\n"
-  _ksui_doctor_check() {
+  _cvui_doctor_check() {
     local label=$1 bin=$2 required=${3:-optional}
     if command -v "$bin" >/dev/null 2>&1; then
       printf "  ${C_GREEN}✔${C_RESET} %-22s ${C_DIM}(%s)${C_RESET}\n" "$label" "$(command -v "$bin")"
@@ -366,57 +407,57 @@ cmd::doctor() {
       fi
     fi
   }
-  _ksui_doctor_check "bash"      bash    required
-  _ksui_doctor_check "zsh"       zsh     required
-  _ksui_doctor_check "git"       git     required
-  _ksui_doctor_check "curl"      curl    required
-  _ksui_doctor_check "lsd"       lsd
-  _ksui_doctor_check "tgpt"      tgpt
-  _ksui_doctor_check "fzf"       fzf
-  _ksui_doctor_check "fd"        fd
-  _ksui_doctor_check "espeak"    espeak
-  _ksui_doctor_check "sox"       play
-  _ksui_doctor_check "qrencode"  qrencode
-  _ksui_doctor_check "neofetch"  neofetch
-  _ksui_doctor_check "openssl"   openssl
-  _ksui_doctor_check "termux-api" termux-notification
+  _cvui_doctor_check "bash"      bash    required
+  _cvui_doctor_check "zsh"       zsh     required
+  _cvui_doctor_check "git"       git     required
+  _cvui_doctor_check "curl"      curl    required
+  _cvui_doctor_check "lsd"       lsd
+  _cvui_doctor_check "tgpt"      tgpt
+  _cvui_doctor_check "fzf"       fzf
+  _cvui_doctor_check "fd"        fd
+  _cvui_doctor_check "espeak"    espeak
+  _cvui_doctor_check "sox"       play
+  _cvui_doctor_check "qrencode"  qrencode
+  _cvui_doctor_check "neofetch"  neofetch
+  _cvui_doctor_check "openssl"   openssl
+  _cvui_doctor_check "termux-api" termux-notification
   printf "${C_GRAY}────────────────────────────────${C_RESET}\n"
-  # KSUI installation checks
+  # cvui installation checks
   local ok=1
-  for f in "$KSUI_HOME/bin/ksui" "$KSUI_HOME/motd/init.sh" "$KSUI_HOME/lib/auth.sh"; do
+  for f in "$cvui_HOME/bin/cvui" "$cvui_HOME/motd/init.sh" "$cvui_HOME/lib/auth.sh"; do
     if [[ -e $f ]]; then
-      printf "  ${C_GREEN}✔${C_RESET} %s\n" "${f#$KSUI_HOME/}"
+      printf "  ${C_GREEN}✔${C_RESET} %s\n" "${f#$cvui_HOME/}"
     else
-      printf "  ${C_RED}✖${C_RESET} %s ${C_RED}missing${C_RESET}\n" "${f#$KSUI_HOME/}"
+      printf "  ${C_RED}✖${C_RESET} %s ${C_RED}missing${C_RESET}\n" "${f#$cvui_HOME/}"
       ok=0
     fi
   done
   if (( ok )); then
-    ui::say_status OK "KSUI install looks healthy."
+    ui::say_status OK "cvui install looks healthy."
   else
-    ui::say_status ERR "Some KSUI files are missing — try: ksui update"
+    ui::say_status ERR "Some cvui files are missing — try: cvui update"
   fi
-  unset -f _ksui_doctor_check
+  unset -f _cvui_doctor_check
 }
 
 cmd::voice_toggle() {
-  local cfg="$HOME/.ksui/voice"
+  local cfg="$HOME/.cvui/voice"
   case "${1:-}" in
     on)
-      export KSUI_VOICE=1
+      export cvui_VOICE=1
       mkdir -p "$(dirname "$cfg")"
       printf '1\n' > "$cfg"
       ui::say_status OK "Voice enabled (saved)"
       voice::say "Voice online."
       ;;
     off)
-      export KSUI_VOICE=0
+      export cvui_VOICE=0
       mkdir -p "$(dirname "$cfg")"
       printf '0\n' > "$cfg"
       ui::say_status OK "Voice muted (saved)"
       ;;
     *)
-      ui::say_status INFO "Voice is currently: $([[ ${KSUI_VOICE:-1} -eq 1 ]] && echo on || echo off)"
+      ui::say_status INFO "Voice is currently: $([[ ${cvui_VOICE:-1} -eq 1 ]] && echo on || echo off)"
       ;;
   esac
 }
@@ -428,17 +469,17 @@ cmd::banner() {
     return 1
   fi
   if ! command -v banner::build >/dev/null 2>&1; then
-    [[ -f "$KSUI_HOME/lib/banner.sh" ]] && source "$KSUI_HOME/lib/banner.sh"
+    [[ -f "$cvui_HOME/lib/banner.sh" ]] && source "$cvui_HOME/lib/banner.sh"
   fi
   banner::build "$text"
 }
 
 cmd::whoami() {
-  printf "  ${C_CYAN}%s${C_RESET} (KSUI session)\n" "${KSUI_USER:-unknown}"
+  printf "  ${C_CYAN}%s${C_RESET} (cvui session)\n" "${cvui_USER:-unknown}"
 }
 
 cmd::update() {
-  if [[ ! -d $KSUI_HOME/.git ]]; then
+  if [[ ! -d $cvui_HOME/.git ]]; then
     ui::say_status ERR "Not a git install — cannot self-update."
     ui::say_status INFO "Re-run the installer manually to update."
     return 1
@@ -447,9 +488,9 @@ cmd::update() {
   # Stash any user-modified tracked files so `git pull --ff-only` can't
   # blow away their banner / theme tweaks. We restore them after pulling.
   local stashed=0
-  if [[ -n "$(git -C "$KSUI_HOME" status --porcelain 2>/dev/null)" ]]; then
+  if [[ -n "$(git -C "$cvui_HOME" status --porcelain 2>/dev/null)" ]]; then
     ui::say_status INFO "Saving your local tweaks (banner, themes, etc.)…"
-    if git -C "$KSUI_HOME" stash push -u -m "ksui-update-$(date +%s)" \
+    if git -C "$cvui_HOME" stash push -u -m "cvui-update-$(date +%s)" \
          >/dev/null 2>&1; then
       stashed=1
     else
@@ -459,9 +500,9 @@ cmd::update() {
   fi
 
   ui::say_status INFO "Fetching latest from origin…"
-  if ! git -C "$KSUI_HOME" pull --ff-only; then
+  if ! git -C "$cvui_HOME" pull --ff-only; then
     ui::say_status ERR "git pull failed — resolve conflicts and retry."
-    (( stashed )) && git -C "$KSUI_HOME" stash pop >/dev/null 2>&1 || true
+    (( stashed )) && git -C "$cvui_HOME" stash pop >/dev/null 2>&1 || true
     return 1
   fi
 
@@ -469,29 +510,48 @@ cmd::update() {
   # conflicts with an upstream change, leave the conflict in-tree for the
   # user to resolve — better than silently losing their work.
   if (( stashed )); then
-    if git -C "$KSUI_HOME" stash pop >/dev/null 2>&1; then
+    if git -C "$cvui_HOME" stash pop >/dev/null 2>&1; then
       ui::say_status OK "Restored your local tweaks on top of the update."
     else
       ui::say_status WARN "Some of your tweaks conflicted with upstream — "
-      ui::say_status WARN "see 'cd $KSUI_HOME && git status' to resolve."
+      ui::say_status WARN "see 'cd $cvui_HOME && git status' to resolve."
     fi
   fi
 
-  ui::say_status OK "KSUI is now up to date."
+  ui::say_status OK "cvui is now up to date."
 
   # Re-run the installer in *update mode*: refreshes code-side assets and
   # the managed .zshrc block, but never touches font/colors/extra-keys/
   # theme selection that the user may have customized.
-  if [[ -x $KSUI_HOME/install/install.sh ]]; then
+  if [[ -x $cvui_HOME/install/install.sh ]]; then
     ui::say_status INFO "Refreshing managed bits (non-destructive)…"
-    KSUI_REPO="$KSUI_HOME" KSUI_INSTALL_DIR="$KSUI_HOME" KSUI_UPDATE_MODE=1 \
-      bash "$KSUI_HOME/install/install.sh" || true
+    cvui_REPO="$cvui_HOME" cvui_INSTALL_DIR="$cvui_HOME" cvui_UPDATE_MODE=1 \
+      bash "$cvui_HOME/install/install.sh" || true
   fi
 }
 
+
+cmd::noauth() {
+  local cfg="$HOME/.cvui/no-lock"
+  case "${1:-}" in
+    on)
+      mkdir -p "$(dirname "$cfg")"
+      touch "$cfg"
+      ui::say_status OK "Authentication bypass enabled (no-auth ON)"
+      ;;
+    off)
+      rm -f "$cfg"
+      ui::say_status OK "Authentication bypass disabled (no-auth OFF)"
+      ;;
+    *)
+      ui::say_status INFO "No-auth is currently: $([[ -f $cfg ]] && echo ON || echo OFF)"
+      ui::say_status INFO "Use: noauth on|off to toggle."
+      ;;
+  esac
+}
 cmd::theme() {
-  local themes_dir="$KSUI_HOME/zsh/themes"
-  local cfg="$HOME/.ksui/theme"
+  local themes_dir="$cvui_HOME/zsh/themes"
+  local cfg="$HOME/.cvui/theme"
   local name="${1:-}"
 
   local -a available=()
@@ -507,13 +567,13 @@ cmd::theme() {
     [[ -f $cfg ]] && current=$(cat "$cfg")
     printf "${C_CYAN}Available themes:${C_RESET}\n"
     for t in "${available[@]}"; do
-      if [[ $t == "${current:-ksui}" ]]; then
+      if [[ $t == "${current:-cvui}" ]]; then
         printf "  ${C_GREEN}●${C_RESET} %s ${C_DIM}(active)${C_RESET}\n" "$t"
       else
         printf "  ${C_DIM}○${C_RESET} %s\n" "$t"
       fi
     done
-    printf "\n${C_DIM}Use: ksui theme <name>${C_RESET}\n"
+    printf "\n${C_DIM}Use: cvui theme <name>${C_RESET}\n"
     return 0
   fi
 
@@ -530,4 +590,147 @@ cmd::theme() {
   printf '%s\n' "$chosen" > "$cfg"
   ui::say_status OK "Theme set to: $chosen"
   ui::say_status INFO "Open a new shell (or run: exec zsh) to see it."
+}
+
+# ── time (hacker‑styled clock) ────────────────────────────────────────
+cmd::time() {
+  clear
+  local top="┌─────────────────────────────────────────────────────────────────┐"
+  local mid="├─────────────────────────────────────────────────────────────────┤"
+  local bot="└─────────────────────────────────────────────────────────────────┘"
+  
+  printf "${C_CYAN}%s${C_RESET}\n" "$top"
+  printf "${C_CYAN}│${C_RESET}  ${C_GREEN}⏰ cvui SYSTEM CLOCK${C_RESET}                                ${C_CYAN}│${C_RESET}\n"
+  printf "${C_CYAN}%s${C_RESET}\n" "$mid"
+  
+  while true; do
+    local now=$(date '+%Y-%m-%d %H:%M:%S')
+    local day=$(date '+%A')
+    local zone=$(date '+%Z')
+    printf "${C_CYAN}│${C_RESET}  ${C_BOLD}${C_YELLOW}%s${C_RESET}  ${C_DIM}(%s %s)${C_RESET}                     ${C_CYAN}│${C_RESET}\r" "$now" "$day" "$zone"
+    sleep 1
+  done
+}
+
+cmd::date() {
+  printf "${C_CYAN}📅 ${C_BOLD}%s${C_RESET}\n" "$(date '+%A, %B %d, %Y')"
+  printf "  ${C_DIM}Full:${C_RESET} %s\n" "$(date '+%Y-%m-%d %H:%M:%S %Z')"
+  printf "  ${C_DIM}Unix:${C_RESET} %s\n" "$(date +%s)"
+}
+
+# ── calc (terminal calculator) ────────────────────────────────────────
+cmd::calc() {
+  local expr="$*"
+  if [[ -z $expr ]]; then
+    ui::say_status WARN "Usage: calc <expression>"
+    ui::say_status INFO "Example: calc 2+2, calc '(10*5)/2', calc 'sqrt(144)'"
+    return 1
+  fi
+  # Use bc for calculation, sanitize input
+  local clean=$(printf '%s' "$expr" | tr -cd '0-9.+\\-*/%()sqrt ' 2>/dev/null)
+  if [[ -z $clean ]]; then
+    ui::say_status ERR "Invalid expression"
+    return 1
+  fi
+  local result
+  result=$(echo "scale=4; $clean" | bc 2>/dev/null)
+  if [[ -z $result ]]; then
+    ui::say_status ERR "Calculation error"
+    return 1
+  fi
+  printf "${C_CYAN}🧮 ${C_BOLD}%s${C_RESET} = ${C_GREEN}%s${C_RESET}\n" "$expr" "$result"
+}
+
+# ── bible (verse lookup) ─────────────────────────────────────────────
+cmd::bible() {
+  cmd::_need_curl || return 1
+  local ref="${*:-John 3:16}"
+  
+  # Parse reference
+  local book chapter verse
+  book=$(printf '%s' "$ref" | grep -oE '^[0-9a-zA-Z]+' | head -1)
+  chapter=$(printf '%s' "$ref" | grep -oE '[0-9]+:[0-9]+' | head -1 | cut -d: -f1)
+  verse=$(printf '%s' "$ref" | grep -oE '[0-9]+:[0-9]+' | head -1 | cut -d: -f2)
+  
+  if [[ -z $book || -z $chapter || -z $verse ]]; then
+    ui::say_status WARN "Usage: bible <book chapter:verse>"
+    ui::say_status INFO "Example: bible John 3:16, bible Genesis 1:1"
+    return 1
+  fi
+  
+  # Using bible-api.com (free, no key needed)
+  local api_ref=$(printf '%s' "$ref" | sed 's/ /%20/g')
+  local data
+  data=$(curl -fsSL --max-time 8 "https://bible-api.com/$api_ref" 2>/dev/null)
+  
+  if [[ -z $data ]]; then
+    ui::say_status ERR "Verse not found or service unreachable"
+    return 1
+  fi
+  
+  local text=$(printf '%s' "$data" | grep -oE '"text":"[^"]+"' | head -1 | cut -d'"' -f4 | sed 's/\\n/ /g' | xargs)
+  local ref_out=$(printf '%s' "$data" | grep -oE '"reference":"[^"]+"' | head -1 | cut -d'"' -f4)
+  
+  if [[ -z $text ]]; then
+    ui::say_status ERR "Could not parse verse"
+    return 1
+  fi
+  
+  # Display with nice formatting
+  local top="┌─────────────────────────────────────────────────────────────────┐"
+  local bot="└─────────────────────────────────────────────────────────────────┘"
+  
+  printf "\n${C_CYAN}%s${C_RESET}\n" "$top"
+  printf "${C_CYAN}│${C_RESET}  ${C_YELLOW}📖 ${C_BOLD}%s${C_RESET}                                      ${C_CYAN}│${C_RESET}\n" "${ref_out:-$ref}"
+  printf "${C_CYAN}│${C_RESET}                                                                ${C_CYAN}│${C_RESET}\n"
+  
+  # Word wrap the verse text
+  local words=($text)
+  local line=""
+  for word in "${words[@]}"; do
+    if ((${#line} + ${#word} + 1 > 60)); then
+      printf "${C_CYAN}│${C_RESET}  %s ${C_CYAN}│${C_RESET}\n" "$line"
+      line=""
+    fi
+    line+="$word "
+  done
+  [[ -n $line ]] && printf "${C_CYAN}│${C_RESET}  %s ${C_CYAN}│${C_RESET}\n" "$line"
+  
+  printf "${C_CYAN}%s${C_RESET}\n\n" "$bot"
+}
+
+# ── apps (launcher listing) ──────────────────────────────────────────
+cmd::apps() {
+  printf "${C_CYAN}${C_BOLD}🚀 cvui App Launcher${C_RESET}\n"
+  printf "${C_GRAY}────────────────────────────────────────────${C_RESET}\n"
+  
+  local -a apps=(
+    "weather ⛅ Weather forecast (wttr.in)"
+    "crypto 💰 Cryptocurrency prices"
+    "news 📰 Hacker News headlines"
+    "calc 🧮 Terminal calculator"
+    "bible 📖 Bible verse lookup"
+    "define 📖 Dictionary lookup"
+    "ip 🌐 Public IP & geolocation"
+    "timer ⏳ Pomodoro timer"
+    "notes 📝 View/edit notes"
+    "todo ✅ Todo list manager"
+    "ask 🤖 Ask KAI (AI assistant)"
+    "joke 😄 Random jokes"
+    "fact 💡 Fun facts"
+    "qr 🖼 Generate QR codes"
+    "sysinfo 💻 System information"
+    "time ⏰ Live clock"
+    "theme 🎨 Switch prompt theme"
+    "doctor 🩺 System health check"
+  )
+  
+  for app in "${apps[@]}"; do
+    local cmd="${app%% *}"
+    local desc="${app#* }"
+    printf "  ${C_GREEN}%-12s${C_RESET} %s\n" "$cmd" "$desc"
+  done
+  
+  printf "\n${C_GRAY}────────────────────────────────────────────${C_RESET}\n"
+  printf "${C_DIM}Usage: cvui <command>${C_RESET}\n"
 }

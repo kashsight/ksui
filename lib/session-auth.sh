@@ -1,28 +1,28 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI — session lock. Runs auth::login on shell startup.
+# cvui — session lock. Runs auth::login on shell startup.
 # Skipped if: stdin is not a tty, no creds set up yet, or the user has
-# opted out via `touch ~/.ksui/no-lock`.
+# opted out via `touch ~/.cvui/no-lock`.
 
-KSUI_HOME="${KSUI_HOME:-$HOME/ksui}"
-KSUI_CFG="${KSUI_CFG:-$HOME/.ksui}"
+cvui_HOME="${cvui_HOME:-$HOME/cvui}"
+cvui_CFG="${cvui_CFG:-$HOME/.cvui}"
 
-# Don't lock non-interactive shells, scripts, or ksui's own REPL.
+# Don't lock non-interactive shells, scripts, or cvui's own REPL.
 [[ -t 0 && -t 1 ]] || exit 0
-[[ -n $KSUI_REPL ]] && exit 0
-[[ -f "$KSUI_CFG/no-lock" ]] && exit 0
+[[ -n $cvui_REPL ]] && exit 0
+[[ -f "$cvui_CFG/no-lock" ]] && exit 0
 
 # If creds haven't been created yet, run setup so the user has something
 # to log in with. Skip silently if the auth lib is missing.
-[[ -r "$KSUI_HOME/lib/ui.sh"   ]] && source "$KSUI_HOME/lib/ui.sh"
-[[ -r "$KSUI_HOME/lib/auth.sh" ]] || exit 0
-source "$KSUI_HOME/lib/auth.sh"
+[[ -r "$cvui_HOME/lib/ui.sh"   ]] && source "$cvui_HOME/lib/ui.sh"
+[[ -r "$cvui_HOME/lib/auth.sh" ]] || exit 0
+source "$cvui_HOME/lib/auth.sh"
 
 # Render a small banner so the lock screen feels intentional.
 clear 2>/dev/null
-[[ -x "$KSUI_HOME/motd/motd.d/10-ksui-logo" ]] \
-  && "$KSUI_HOME/motd/motd.d/10-ksui-logo"
+[[ -x "$cvui_HOME/motd/motd.d/10-cvui-logo" ]] \
+  && "$cvui_HOME/motd/motd.d/10-cvui-logo"
 
-if [[ ! -f "$KSUI_AUTH" ]]; then
+if [[ ! -f "$cvui_AUTH" ]]; then
   auth::setup
 fi
 auth::login || {

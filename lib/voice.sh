@@ -1,10 +1,10 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI — KAI voice (espeak preferred, festival fallback, termux-tts last)
+# cvui — KAI voice (espeak preferred, festival fallback, termux-tts last)
 
 # Load persisted voice preference (overrides default, but env wins if exported)
-if [[ -z ${KSUI_VOICE+x} && -f $HOME/.ksui/voice ]]; then
-  _v=$(<"$HOME/.ksui/voice")
-  case "$_v" in 0|1) export KSUI_VOICE=$_v ;; esac
+if [[ -z ${cvui_VOICE+x} && -f $HOME/.cvui/voice ]]; then
+  _v=$(<"$HOME/.cvui/voice")
+  case "$_v" in 0|1) export cvui_VOICE=$_v ;; esac
   unset _v
 fi
 
@@ -17,7 +17,7 @@ voice::available() {
 voice::say() {
   local msg="$*"
   [[ -z $msg ]] && return 0
-  [[ ${KSUI_VOICE:-1} -eq 0 ]] && return 0
+  [[ ${cvui_VOICE:-1} -eq 0 ]] && return 0
 
   if command -v espeak >/dev/null 2>&1; then
     # Deep slow KAI-ish voice
@@ -31,7 +31,7 @@ voice::say() {
 
 voice::greet() {
   local hour=$(date +%H)
-  local user=${KSUI_USER:-sir}
+  local user=${cvui_USER:-sir}
   local greeting="Good evening"
   if   (( hour < 12 )); then greeting="Good morning"
   elif (( hour < 18 )); then greeting="Good afternoon"
@@ -40,5 +40,5 @@ voice::greet() {
 }
 
 voice::bye() {
-  voice::say "Powering down. Goodbye, ${KSUI_USER:-sir}."
+  voice::say "Powering down. Goodbye, ${cvui_USER:-sir}."
 }

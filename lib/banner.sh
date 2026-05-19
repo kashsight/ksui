@@ -1,11 +1,11 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI — banner builder
-# Composes block-ASCII text from $KSUI_HOME/assets/alphabet.txt and writes
-# it to $KSUI_HOME/assets/banner.txt (the customizable banner file shown by
-# `motd` / `ksui motd`). Rejects anything outside [a-zA-Z0-9].
+# cvui — banner builder
+# Composes block-ASCII text from $cvui_HOME/assets/alphabet.txt and writes
+# it to $cvui_HOME/assets/banner.txt (the customizable banner file shown by
+# `motd` / `cvui motd`). Rejects anything outside [a-zA-Z0-9].
 
-banner::_alphabet_file() { printf '%s' "${KSUI_HOME:-$HOME/.ksui-app}/assets/alphabet.txt"; }
-banner::_output_file()   { printf '%s' "${KSUI_HOME:-$HOME/.ksui-app}/assets/banner.txt"; }
+banner::_alphabet_file() { printf '%s' "${cvui_HOME:-$HOME/.cvui-app}/assets/alphabet.txt"; }
+banner::_output_file()   { printf '%s' "${cvui_HOME:-$HOME/.cvui-app}/assets/banner.txt"; }
 
 # banner::build <text>
 # Validates the text, renders it, prints to stdout, and saves it as the

@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/env bash
-# KSUI — UI helpers (colors, banners, ls wrappers)
+# cvui — UI helpers (colors, banners, ls wrappers)
 
 # --- colors ---
 export C_RESET=$'\033[0m'
@@ -20,31 +20,31 @@ ui::hr() {
 }
 
 ui::banner() {
-  # Full motd-style splash: big KASHSIGHT logo + sysinfo + disk panel
-  local motd="${KSUI_HOME}/motd/init.sh"
+  # Full motd-style splash: big cybervaultke logo + sysinfo + disk panel
+  local motd="${cvui_HOME}/motd/init.sh"
   if [[ -x $motd ]]; then
     "$motd"
   else
-    local file="${KSUI_HOME}/assets/banner.txt"
+    local file="${cvui_HOME}/assets/banner.txt"
     [[ -f $file ]] && printf "${C_CYAN}%s${C_RESET}\n" "$(cat "$file")"
   fi
 }
 
 ui::small_banner() {
   # Compact banner for status lines (post-login, etc)
-  local file="${KSUI_HOME}/assets/banner.txt"
+  local file="${cvui_HOME}/assets/banner.txt"
   [[ -f $file ]] && printf "${C_CYAN}%s${C_RESET}\n" "$(cat "$file")"
 }
 
 ui::maker_intro() {
   cat <<EOF
 
-${C_ORANGE}${C_BOLD}⚡ Made by KASHSIGHT ⚡${C_RESET}
+${C_ORANGE}${C_BOLD}⚡ Made by cybervaultke ⚡${C_RESET}
 ${C_GRAY}────────────────────────${C_RESET}
-  ${C_CYAN}🎬 YouTube  ${C_RESET} youtube.com/@kashsight
-  ${C_MAGENTA}📸 Instagram${C_RESET} instagram.com/kashsight
-  ${C_BLUE}📘 Facebook ${C_RESET} facebook.com/kashsight
-  ${C_GREEN}💻 GitHub   ${C_RESET} github.com/kashsight
+  ${C_CYAN}🎬 YouTube  ${C_RESET} youtube.com/@cybervaultke
+  ${C_MAGENTA}📸 Instagram${C_RESET} instagram.com/cybervaultke
+  ${C_BLUE}📘 Facebook ${C_RESET} facebook.com/cybervaultke
+  ${C_GREEN}💻 GitHub   ${C_RESET} github.com/cybervaultke
 ${C_GRAY}────────────────────────${C_RESET}
 EOF
 }
